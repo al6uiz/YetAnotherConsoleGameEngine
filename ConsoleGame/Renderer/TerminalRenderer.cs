@@ -6,8 +6,8 @@ namespace ConsoleGame.Renderer
     public class TerminalRenderer
     {
         private List<Framebuffer> frameBuffers;
-        private int consoleWidth;
-        private int consoleHeight;
+        public int consoleWidth;
+        public int consoleHeight;
         private ConsoleColor currentFg;
         private ConsoleColor currentBg;
         private ConsoleColor defaultFg;

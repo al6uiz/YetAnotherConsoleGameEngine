@@ -13,6 +13,7 @@ namespace ConsoleGame.Renderer
         private Stopwatch stopwatch;
         private List<BaseEntity> entities;
         private Framebuffer entityFramebuffer;
+        private string debugString = "";
 
         public Terminal()
         {
@@ -25,6 +26,14 @@ namespace ConsoleGame.Renderer
             // Create a framebuffer for entities
             entityFramebuffer = new Framebuffer(Console.WindowWidth, Console.WindowHeight - 1);
             renderer.AddFrameBuffer(entityFramebuffer);
+        }
+
+        public void SetDebugString(string str)
+        {
+            if(str != null)
+            {
+                debugString = str;
+            }
         }
 
         public void AddFrameBuffer(Framebuffer fb)
@@ -84,7 +93,16 @@ namespace ConsoleGame.Renderer
                 // HUD: print current fps and ms per frame on the last console line
                 double frameMs = stopwatch.Elapsed.TotalMilliseconds;
                 double fps = frameMs > 0.0 ? 1000.0 / frameMs : 0.0;
-                string hud = $"fps: {fps:0.0}  ms: {frameMs:0.00}";
+                string hud = $"{debugString} fps: {fps:0.0}  ms: {frameMs:0.00}";
+                int hudlen = renderer.consoleWidth - 1;
+                if (hud.Length < hudlen)
+                {
+                    hud = hud.PadRight(hudlen);
+                }
+                else if (hud.Length > hudlen)
+                {
+                    hud = hud.Substring(0, hudlen);
+                }
                 Console.Write(hud);
             }
 

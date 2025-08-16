@@ -10,11 +10,13 @@ namespace ConsoleRayTracing
 {
     public static class Program
     {
+        public static Terminal terminal;
+
         private static void Main(string[] args)
         {
             Console.CursorVisible = false;
 
-            Terminal terminal = new Terminal();
+            terminal = new Terminal();
 
             int cellsW = Console.WindowWidth - 1;
             int cellsH = Console.WindowHeight - 1;
