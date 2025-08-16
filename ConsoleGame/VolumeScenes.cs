@@ -266,6 +266,8 @@ namespace ConsoleRayTracing
         public static VolumeScene BuildMinecraftLike(string filename, Vec3 worldMinCorner, Vec3 voxelSize, Func<int, int, Material> materialLookup, int chunksX = 8, int chunksY = 4, int chunksZ = 8, int chunkSize = 32)
         {
             VolumeScene s = new VolumeScene();
+            s.DefaultCameraPos = new Vec3(0, 100, 0);
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.5f);
 
             s.BackgroundTop = new Vec3(0.02, 0.02, 0.03);
             s.BackgroundBottom = new Vec3(0.01, 0.01, 0.01);

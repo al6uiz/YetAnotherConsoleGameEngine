@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracing
 {
-    public sealed class Material
+    public struct Material
     {
         public Vec3 Albedo;
         public double Specular;

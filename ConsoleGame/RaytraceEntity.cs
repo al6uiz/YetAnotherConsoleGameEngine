@@ -3,6 +3,7 @@ using ConsoleGame.Components;
 using ConsoleGame.Entities;
 using ConsoleGame.Renderer;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,24 +13,35 @@ namespace ConsoleRayTracing
     {
         private readonly Framebuffer fb;
         private readonly RaytraceRenderer renderer;
+        private readonly Scene activeScene;
+        private readonly Dictionary<int, Scene> sceneCache = new Dictionary<int, Scene>();
+        private readonly Func<Scene>[] sceneBuilders;
+        private int sceneIndex;
+
         private Vec3 camPos;
         private float yaw;
         private float pitch;
         private float lastDeltaTime = 1.0f / 60.0f;
 
-        public RaytraceEntity(BaseEntity entity, Framebuffer framebuffer, Scene scene, float fovDeg, int pxW, int pxH, int superSample)
+        public RaytraceEntity(BaseEntity entity, Framebuffer framebuffer, int pxW, int pxH, int superSample)
         {
-            Parent = entity;
             this.fb = framebuffer;
-            this.camPos = new Vec3(0.0, 1.0, 0.0);
+            this.camPos = new Vec3(0.0, 10.0, 0.0);
             this.yaw = 0.0f;
             this.pitch = 0.0f;
-            Parent.X = 0;
-            Parent.Y = 0;
-            Parent.Chexel = new Chexel(' ', ConsoleColor.Black, ConsoleColor.Black);
 
-            renderer = new RaytraceRenderer(framebuffer, scene, fovDeg, pxW, pxH, superSample);
-            renderer.SetCamera(camPos, yaw, pitch);
+            this.sceneBuilders = BuildSceneTable();
+            this.sceneIndex = DefaultSceneIndex();
+
+            Scene initial = GetOrBuildScene(this.sceneIndex);
+            this.activeScene = new Scene();
+            this.renderer = new RaytraceRenderer(framebuffer, this.activeScene, initial.DefaultFovDeg, pxW, pxH, superSample);
+            this.camPos = initial.DefaultCameraPos;
+            this.yaw = initial.DefaultYaw;
+            this.pitch = initial.DefaultPitch;
+            this.renderer.SetCamera(camPos, yaw, pitch);
+
+            SwitchToScene(this.sceneIndex);
         }
 
         public override void HandleInput(ConsoleKeyInfo keyInfo)
@@ -106,6 +118,26 @@ namespace ConsoleRayTracing
                 camPos = camPos - up * (moveSpeed * dt);
             }
 
+            if (keyInfo.Key == ConsoleKey.I)
+            {
+                int count = sceneBuilders.Length;
+                if (count > 0)
+                {
+                    sceneIndex = (sceneIndex + 1) % count;
+                    SwitchToScene(sceneIndex);
+                }
+            }
+
+            if (keyInfo.Key == ConsoleKey.U)
+            {
+                int count = sceneBuilders.Length;
+                if (count > 0)
+                {
+                    sceneIndex = (sceneIndex - 1 + count) % count;
+                    SwitchToScene(sceneIndex);
+                }
+            }
+
             renderer.SetCamera(camPos, yaw, pitch);
         }
 
@@ -114,6 +146,80 @@ namespace ConsoleRayTracing
             lastDeltaTime = (float)deltaTime;
             renderer.SetCamera(camPos, yaw, pitch);
             renderer.TryFlipAndBlit(fb);
+        }
+
+        private void SwitchToScene(int index)
+        {
+            Scene src = GetOrBuildScene(index);
+            activeScene.Objects.Clear();
+            activeScene.Objects.AddRange(src.Objects);
+            activeScene.Lights.Clear();
+            activeScene.Lights.AddRange(src.Lights);
+            activeScene.BackgroundTop = src.BackgroundTop;
+            activeScene.BackgroundBottom = src.BackgroundBottom;
+            activeScene.Ambient = src.Ambient;
+            this.camPos = src.DefaultCameraPos;
+            this.yaw = src.DefaultYaw;
+            this.pitch = src.DefaultPitch;
+            this.renderer.SetFov(src.DefaultFovDeg);
+            this.renderer.SetCamera(camPos, yaw, pitch);
+            activeScene.RebuildBVH();
+        }
+
+        private Scene GetOrBuildScene(int index)
+        {
+            Scene s;
+            if (sceneCache.TryGetValue(index, out s))
+            {
+                return s;
+            }
+            if (index < 0 || index >= sceneBuilders.Length)
+            {
+                s = new Scene();
+                sceneCache[index] = s;
+                return s;
+            }
+            s = sceneBuilders[index]();
+            sceneCache[index] = s;
+            return s;
+        }
+
+        private static int DefaultSceneIndex()
+        {
+            return 0;
+        }
+
+        private static Func<Scene>[] BuildSceneTable()
+        {
+            List<Func<Scene>> list = new List<Func<Scene>>();
+
+            list.Add(() => Scenes.BuildTestScene());
+            list.Add(() => Scenes.BuildDemoScene());
+            list.Add(() => Scenes.BuildCornellBox());
+            list.Add(() => Scenes.BuildMirrorSpheresOnChecker());
+            list.Add(() => Scenes.BuildCylindersDisksAndTriangles());
+            list.Add(() => Scenes.BuildBoxesShowcase());
+            list.Add(() => Scenes.BuildVolumeGridTestScene());
+            list.Add(() => MeshScenes.BuildAllMeshesScene());
+            list.Add(() => MeshScenes.BuildBunnyScene());
+            list.Add(() => MeshScenes.BuildTeapotScene());
+            list.Add(() => MeshScenes.BuildCowScene());
+            list.Add(() => MeshScenes.BuildDragonScene());
+            list.Add(() =>
+            {
+                Func<int, int, Material> materialLookup = (id, meta) =>
+                {
+                    if (id == 1) return new Material(new Vec3(0.55, 0.55, 0.55), 0.0, 0.0, Vec3.Zero);
+                    if (id == 2) return new Material(new Vec3(0.40, 0.25, 0.15), 0.0, 0.0, Vec3.Zero);
+                    if (id == 3) return new Material(new Vec3(0.15, 0.75, 0.20), 0.1, 0.0, Vec3.Zero);
+                    if (id == 4) return new Material(new Vec3(0.15, 0.35, 0.95), 0.0, 0.02, Vec3.Zero);
+                    if (id == 5) return new Material(new Vec3(0.9, 0.85, 0.55), 0.0, 0.0, Vec3.Zero);
+                    return new Material(new Vec3(0.7, 0.7, 0.7), 0.0, 0.0, Vec3.Zero);
+                };
+                return VolumeScenes.BuildMinecraftLike("test.bin", new Vec3(-100, -100, -100), new Vec3(2, 2, 2), materialLookup, 8, 8, 8, 32);
+            });
+
+            return list.ToArray();
         }
     }
 }

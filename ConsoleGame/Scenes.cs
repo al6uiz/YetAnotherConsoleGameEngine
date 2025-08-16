@@ -5,7 +5,7 @@
         public static Scene BuildTestScene()
         {
             Scene s = new Scene();
-
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.01f);
             Material red = new Material(new Vec3(1.0, 0.0, 0.0), 0.15, 0.0, Vec3.Zero);
             Material green = new Material(new Vec3(0.0, 1.0, 0.0), 0.15, 0.0, Vec3.Zero);
             Material blue = new Material(new Vec3(0.0, 0.0, 1.0), 0.15, 0.0, Vec3.Zero);
@@ -30,6 +30,7 @@
         public static Scene BuildVolumeGridTestScene()
         {
             Scene s = new Scene();
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.01f);
 
             int nx = 16;
             int ny = 8;
@@ -126,6 +127,7 @@
         public static Scene BuildDemoScene()
         {
             Scene s = new Scene();
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.01f);
 
             Material red = new Material(new Vec3(0.9, 0.2, 0.2), 0.25, 0.2, Vec3.Zero);
             Material green = new Material(new Vec3(0.2, 0.9, 0.2), 0.25, 0.1, Vec3.Zero);
@@ -192,8 +194,8 @@
                 for (int attempt = 0; attempt < attemptsPerSphere && !placed; attempt++)
                 {
                     float radius = 0.18f + ((float)rng.NextDouble()) * 0.32f; // [0.18, 0.50]
-                    float x = -3.0f + ((float)rng.NextDouble()) * 6.0f;       // [-3, 3]
-                    float z = -4.8f + ((float)rng.NextDouble()) * 4.6f;       // [-4.8, -0.2]
+                    float x = -9.0f + ((float)rng.NextDouble()) * 9.0f;       // [-3, 3]
+                    float z = -9.8f + ((float)rng.NextDouble()) * 4.6f;       // [-4.8, -0.2]
                     float y = radius;                               // sit on the ground plane (y=0)
                     Vec3 center = new Vec3(x, y, z);
 
@@ -223,11 +225,12 @@
         public static Scene BuildCornellBox()
         {
             Scene s = new Scene();
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.00f);
 
             Func<Vec3, Vec3, float, Material> white = Solid(new Vec3(0.82, 0.82, 0.82));
             Func<Vec3, Vec3, float, Material> red = Solid(new Vec3(0.80, 0.10, 0.10));
             Func<Vec3, Vec3, float, Material> green = Solid(new Vec3(0.10, 0.80, 0.10));
-            Func<Vec3, Vec3, float, Material> lightEmit = Emissive(new Vec3(12.0, 12.0, 12.0));
+            Func<Vec3, Vec3, float, Material> lightEmit = Emissive(new Vec3(0.6, 0.6, 0.6));
 
             float xL = -3.0f;
             float xR = 3.0f;
@@ -252,7 +255,7 @@
             s.Objects.Add(new Box(new Vec3(-2.2, 0.0, -4.0), new Vec3(-0.8, 1.0, -2.8), white, 0.0f, 0.0f));
             s.Objects.Add(new Box(new Vec3(0.6, 0.0, -3.3), new Vec3(2.0, 1.8, -2.1), white, 0.0f, 0.0f));
 
-            s.Lights.Add(new PointLight(new Vec3(0.0, 4.6, -2.7), new Vec3(1.0, 1.0, 1.0), 220.0f));
+            s.Lights.Add(new PointLight(new Vec3(0.0, 4.6, -2.7), new Vec3(1.0, 1.0, 1.0), 20.0f));
 
             s.BackgroundTop = new Vec3(0.0, 0.0, 0.0);
             s.BackgroundBottom = new Vec3(0.0, 0.0, 0.0);
@@ -264,6 +267,7 @@
         public static Scene BuildMirrorSpheresOnChecker()
         {
             Scene s = new Scene();
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.01f);
 
             Func<Vec3, Vec3, float, Material> floor = Checker(new Vec3(0.8, 0.8, 0.8), new Vec3(0.15, 0.15, 0.15), 0.6f);
             s.Objects.Add(new XZRect(-8.0f, 8.0f, -8.0f, 4.0f, 0.0f, floor, 0.1f, 0.0f));
@@ -289,6 +293,7 @@
         public static Scene BuildCylindersDisksAndTriangles()
         {
             Scene s = new Scene();
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.01f);
 
             Func<Vec3, Vec3, float, Material> floor = Checker(new Vec3(0.75, 0.75, 0.75), new Vec3(0.2, 0.2, 0.2), 0.8f);
             s.Objects.Add(new Plane(new Vec3(0.0, 0.0, 0.0), new Vec3(0.0, 1.0, 0.0), floor, 0.05f, 0.0f));
@@ -314,6 +319,7 @@
         public static Scene BuildBoxesShowcase()
         {
             Scene s = new Scene();
+            s.Ambient = new AmbientLight(new Vec3(1, 1, 1), 0.01f);
 
             Func<Vec3, Vec3, float, Material> floor = Checker(new Vec3(0.85, 0.85, 0.85), new Vec3(0.15, 0.15, 0.15), 0.7f);
             s.Objects.Add(new Plane(new Vec3(0.0, 0.0, 0.0), new Vec3(0.0, 1.0, 0.0), floor, 0.05f, 0.0f));

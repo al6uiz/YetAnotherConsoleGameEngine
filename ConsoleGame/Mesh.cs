@@ -27,7 +27,6 @@ namespace ConsoleRayTracing
 
         public static Mesh FromObj(string path, Material defaultMaterial, float scale = 1.0f, Vec3? translate = null)
         {
-            if (defaultMaterial == null) throw new ArgumentNullException(nameof(defaultMaterial));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("path");
             if (!File.Exists(path)) throw new FileNotFoundException("OBJ not found", path);
 

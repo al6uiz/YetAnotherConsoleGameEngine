@@ -38,6 +38,7 @@ namespace ConsoleRayTracing
         public static Scene BuildDragonScene()
         {
             Scene s = NewBaseScene();
+            s.DefaultCameraPos = new Vec3(0, 10, 0);
             Material dragonMat = MeshSwatches.Mirror(MeshSwatches.Sapphire, 0.70);
             AddMeshAutoGround(s, @"assets\xyzrgb_dragon.obj", dragonMat, scale: 0.12f, targetPos: new Vec3(0.0f, 0.0f, -3.6f));
             s.RebuildBVH();
@@ -62,7 +63,7 @@ namespace ConsoleRayTracing
         private static Scene NewBaseScene()
         {
             Scene s = new Scene();
-            s.Objects.Add(new Plane(new Vec3(0.0, 0.0, 0.0), new Vec3(0.0, 1.0, 0.0), FloorMat(new Vec3(0.30, 0.30, 0.30)), 0.00f, 0.00f));
+            s.Objects.Add(new Plane(new Vec3(0.0, 0.0, 0.0), new Vec3(0.0, 1.0, 0.0), FloorMat(new Vec3(1, 1, 1)), 0.01f, 0.00f));
             s.Lights.Add(new PointLight(new Vec3(0.0, 30.6, -4.2), new Vec3(1.0, 0.95, 0.88), 110.0f));
             s.Lights.Add(new PointLight(new Vec3(0.0, 30.0, 4.2), new Vec3(0.85, 0.90, 1.0), 85.0f));
             s.BackgroundTop = new Vec3(0.0, 0.0, 0.0);

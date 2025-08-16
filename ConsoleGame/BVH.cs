@@ -143,30 +143,7 @@ namespace ConsoleRayTracing
             }
         }
 
-        private struct DebugCounters
-        {
-            public int NodeVisits;
-            public int AabbTests;
-            public int Misses;
-            public int LeafTests;
-            public int LeafHits;
-            public int HitDepth;
-            public int StackPeak;
-            public int HitLeafId;
-
-            public void NoteDepth(int depth)
-            {
-                if (depth > StackPeak)
-                {
-                    StackPeak = depth;
-                }
-            }
-        }
-
-        public bool Debug = true;
-
         private readonly Node root;
-        private readonly List<Hittable> unbounded = new List<Hittable>();
 
         public BVH(IEnumerable<Hittable> objects)
         {
@@ -186,7 +163,7 @@ namespace ConsoleRayTracing
                 }
                 else
                 {
-                    unbounded.Add(h);
+                    throw new Exception("Unbounded Hittable");
                 }
             }
             if (items.Count > 0)
@@ -206,47 +183,14 @@ namespace ConsoleRayTracing
             float closest = tMax;
             HitRecord tmp = default;
 
-            DebugCounters ctrs = default;
-
             if (root != null)
             {
-                if (HitNode(root, r, tMin, closest, 0, ref tmp, ref ctrs))
+                if (HitNode(root, r, tMin, closest, 0, ref tmp))
                 {
                     hitAnything = true;
                     closest = tmp.T;
                     rec = tmp;
                 }
-            }
-
-            for (int i = 0; i < unbounded.Count; i++)
-            {
-                ctrs.LeafTests++;
-                bool hb = unbounded[i].Hit(r, tMin, closest, ref tmp);
-                if (hb)
-                {
-                    ctrs.LeafHits++;
-                    hitAnything = true;
-                    closest = tmp.T;
-                    rec = tmp;
-                    if (Debug)
-                    {
-                        ctrs.HitLeafId = RuntimeHelpers.GetHashCode(unbounded[i]);
-                        ctrs.HitDepth = Math.Max(ctrs.HitDepth, 0);
-                    }
-                }
-            }
-
-            if (Debug)
-            {
-                rec.DebugNodeVisits = ctrs.NodeVisits;
-                rec.DebugAabbTests = ctrs.AabbTests;
-                rec.DebugMisses = ctrs.Misses;
-                rec.DebugLeafTests = ctrs.LeafTests;
-                rec.DebugLeafHits = ctrs.LeafHits;
-                rec.DebugHitDepth = ctrs.HitDepth;
-                rec.DebugStackPeak = ctrs.StackPeak;
-                rec.DebugLeafId = ctrs.HitLeafId;
-                rec.DebugWasBVH = 1;
             }
 
             return hitAnything;
@@ -316,29 +260,16 @@ namespace ConsoleRayTracing
             return node;
         }
 
-        private static bool HitNode(Node node, Ray r, float tMin, float tMax, int depth, ref HitRecord rec, ref DebugCounters ctrs)
+        private static bool HitNode(Node node, Ray r, float tMin, float tMax, int depth, ref HitRecord rec)
         {
-            ctrs.NodeVisits++;
-            ctrs.AabbTests++;
-            ctrs.NoteDepth(depth);
-
             if (!node.Box.Hit(r, tMin, tMax))
             {
-                ctrs.Misses++;
                 return false;
             }
 
             if (node.IsLeaf())
             {
-                ctrs.LeafTests++;
-                bool h = node.Leaf.Hit(r, tMin, tMax, ref rec);
-                if (h)
-                {
-                    ctrs.LeafHits++;
-                    ctrs.HitLeafId = node.LeafId;
-                    ctrs.HitDepth = depth;
-                }
-                return h;
+                return node.Leaf.Hit(r, tMin, tMax, ref rec);
             }
 
             HitRecord leftRec = default;
@@ -348,7 +279,7 @@ namespace ConsoleRayTracing
 
             if (node.Left != null)
             {
-                hitLeft = HitNode(node.Left, r, tMin, tMax, depth + 1, ref leftRec, ref ctrs);
+                hitLeft = HitNode(node.Left, r, tMin, tMax, depth + 1, ref leftRec);
                 if (hitLeft)
                 {
                     tMax = leftRec.T;
@@ -357,7 +288,7 @@ namespace ConsoleRayTracing
 
             if (node.Right != null)
             {
-                hitRight = HitNode(node.Right, r, tMin, tMax, depth + 1, ref rightRec, ref ctrs);
+                hitRight = HitNode(node.Right, r, tMin, tMax, depth + 1, ref rightRec);
             }
 
             if (hitLeft && hitRight)
@@ -486,12 +417,21 @@ namespace ConsoleRayTracing
                 return true;
             }
 
+            VolumeGrid vg = h as VolumeGrid;
+            if (vg != null)
+            {
+                box = new AABB(vg.BoundsMin, vg.BoundsMax);
+                centroid = (vg.BoundsMin + vg.BoundsMax) * 0.5f;
+                return true;
+            }
+
             Plane pl = h as Plane;
             if (pl != null)
             {
-                box = default;
-                centroid = default;
-                return false;
+                float B = 1e6f;
+                box = new AABB(new Vec3(-B, -B, -B), new Vec3(B, B, B));
+                centroid = Vec3.Zero;
+                return true;
             }
 
             box = default;

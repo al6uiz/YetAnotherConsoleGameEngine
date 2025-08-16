@@ -10,6 +10,11 @@ namespace ConsoleRayTracing
         public List<PointLight> Lights = new List<PointLight>();
         public Vec3 BackgroundTop = new Vec3(0.6, 0.8, 1.0);
         public Vec3 BackgroundBottom = new Vec3(1.0, 1.0, 1.0);
+        public AmbientLight Ambient = new AmbientLight(new Vec3(1.0, 1.0, 1.0), 0.075f);
+        public float DefaultFovDeg = 30.0f;
+        public Vec3 DefaultCameraPos = new Vec3(0.0, 1.0, 0.0);
+        public float DefaultYaw = 0.0f;
+        public float DefaultPitch = 0.0f;
 
         private BVH bvh;
 

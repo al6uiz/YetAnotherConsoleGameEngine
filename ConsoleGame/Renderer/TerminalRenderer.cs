@@ -64,16 +64,10 @@ namespace ConsoleGame.Renderer
 
         public void Render()
         {
-            Console.CursorVisible = false;
-
-            //// Sync cached colors with the console's actual state to avoid banding/stripes
-            currentFg = Console.ForegroundColor;
-            currentBg = Console.BackgroundColor;
+            Console.SetCursorPosition(0, 0);
 
             for (int y = 0; y < consoleHeight; y++)
             {
-                Console.SetCursorPosition(0, y);
-
                 ConsoleColor? runFg = null;
                 ConsoleColor? runBg = null;
                 int segmentStart = 0;
@@ -130,10 +124,8 @@ namespace ConsoleGame.Renderer
                     Console.BackgroundColor = runBg.Value;
                     currentBg = runBg.Value;
                 }
-                Console.Write(lineBuffer, segmentStart, consoleWidth - segmentStart);
+                Console.WriteLine(lineBuffer, segmentStart, consoleWidth - segmentStart);
             }
-
-            Console.ResetColor();
         }
     }
 }

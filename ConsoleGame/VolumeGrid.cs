@@ -22,6 +22,9 @@ namespace ConsoleRayTracing
             this.voxelSize = new Vec3(Math.Max(1e-6, voxelSize.X), Math.Max(1e-6, voxelSize.Y), Math.Max(1e-6, voxelSize.Z));
             this.materialLookup = materialLookup;
         }
+        public Vec3 BoundsMin { get { return minCorner; } }
+        public Vec3 BoundsMax { get { return new Vec3(minCorner.X + nx * voxelSize.X, minCorner.Y + ny * voxelSize.Y, minCorner.Z + nz * voxelSize.Z); } }
+
 
         public override bool Hit(Ray r, float tMin, float tMax, ref HitRecord rec)
         {
