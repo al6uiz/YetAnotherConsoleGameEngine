@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace ConsoleRayTracing
+{
+    public class Scene
+    {
+        public List<Hittable> Objects = new List<Hittable>();
+        public List<PointLight> Lights = new List<PointLight>();
+        public Vec3 BackgroundTop = new Vec3(0.6, 0.8, 1.0);
+        public Vec3 BackgroundBottom = new Vec3(1.0, 1.0, 1.0);
+
+        private BVH bvh;
+
+        public virtual void RebuildBVH()
+        {
+            bvh = new BVH(Objects);
+        }
+
+        public virtual bool Hit(Ray r, float tMin, float tMax, ref HitRecord outRec)
+        {
+            if (bvh == null) throw new InvalidOperationException("Scene BVH not built; call RebuildBVH() after populating Objects.");
+            return bvh.Hit(r, tMin, tMax, ref outRec);
+        }
+
+        public virtual bool Occluded(Ray r, float maxDist)
+        {
+            if (bvh == null) throw new InvalidOperationException("Scene BVH not built; call RebuildBVH() after populating Objects.");
+            HitRecord rec = default;
+            return bvh.Hit(r, 0.001f, maxDist, ref rec);
+        }
+    }
+}

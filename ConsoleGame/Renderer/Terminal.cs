@@ -80,6 +80,12 @@ namespace ConsoleGame.Renderer
 
                 // Render the current frame
                 renderer.Render();
+
+                // HUD: print current fps and ms per frame on the last console line
+                double frameMs = stopwatch.Elapsed.TotalMilliseconds;
+                double fps = frameMs > 0.0 ? 1000.0 / frameMs : 0.0;
+                string hud = $"fps: {fps:0.0}  ms: {frameMs:0.00}";
+                Console.Write(hud);
             }
 
             stopwatch.Stop(); // Stop the stopwatch
