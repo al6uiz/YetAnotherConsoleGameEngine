@@ -1,10 +1,5 @@
-﻿using ConsoleGame.Renderer;
-using ConsoleGame.Entities;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using ConsoleGame.Components;
+﻿using ConsoleGame.Entities;
+using ConsoleGame.Renderer;
 
 namespace ConsoleRayTracing
 {
@@ -16,12 +11,12 @@ namespace ConsoleRayTracing
         {
             Console.CursorVisible = false;
 
-            terminal = new Terminal();
-
-            int cellsW = Console.WindowWidth - 1;
+            int cellsW = Console.WindowWidth;
             int cellsH = Console.WindowHeight - 1;
 
-            int superSample = 1;
+            terminal = new Terminal(cellsW, cellsH);
+
+            int superSample = 3;
             if (args != null && args.Length > 0)
             {
                 int parsed;
@@ -46,7 +41,5 @@ namespace ConsoleRayTracing
             Console.ResetColor();
             Console.CursorVisible = true;
         }
-
-       
     }
 }

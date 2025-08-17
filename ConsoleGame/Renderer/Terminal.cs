@@ -15,22 +15,22 @@ namespace ConsoleGame.Renderer
         private Framebuffer entityFramebuffer;
         private string debugString = "";
 
-        public Terminal()
+        public Terminal(int width,int height)
         {
-            renderer = new TerminalRenderer();
+            renderer = new TerminalRenderer(width,height);
             input = new TerminalInput();
             isRunning = false;
             stopwatch = new Stopwatch();
             entities = new List<BaseEntity>();
 
             // Create a framebuffer for entities
-            entityFramebuffer = new Framebuffer(Console.WindowWidth, Console.WindowHeight - 1);
+            entityFramebuffer = new Framebuffer(width,height);
             renderer.AddFrameBuffer(entityFramebuffer);
         }
 
         public void SetDebugString(string str)
         {
-            if(str != null)
+            if (str != null)
             {
                 debugString = str;
             }
@@ -153,7 +153,7 @@ namespace ConsoleGame.Renderer
                 if (entity.X >= 0 && entity.X < entityFramebuffer.Width &&
                     entity.Y >= 0 && entity.Y < entityFramebuffer.Height)
                 {
-                    entityFramebuffer.SetChexel(entity.X, entity.Y, entity.Chexel);
+                    entityFramebuffer.chexels[entity.X, entity.Y] = entity.Chexel;
                 }
             }
         }

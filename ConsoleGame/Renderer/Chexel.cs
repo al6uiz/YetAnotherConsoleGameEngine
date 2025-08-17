@@ -1,12 +1,14 @@
-﻿namespace ConsoleGame.Renderer
+﻿using System.Drawing;
+
+namespace ConsoleGame.Renderer
 {
     public struct Chexel
     {
         public char Char;
-        public ConsoleColor ForegroundColor;
-        public ConsoleColor BackgroundColor;
+        public Color ForegroundColor;
+        public Color BackgroundColor;
 
-        public Chexel(char ch, ConsoleColor fgColor, ConsoleColor bgColor)
+        public Chexel(char ch, Color fgColor, Color bgColor)
         {
             Char = ch;
             ForegroundColor = fgColor;

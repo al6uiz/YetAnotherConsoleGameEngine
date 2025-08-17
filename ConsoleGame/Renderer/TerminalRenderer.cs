@@ -1,5 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Spectre.Console;
+using Spectre.Console.Rendering;
+
+using Color = System.Drawing.Color;
 
 namespace ConsoleGame.Renderer
 {
@@ -8,24 +10,15 @@ namespace ConsoleGame.Renderer
         private List<Framebuffer> frameBuffers;
         public int consoleWidth;
         public int consoleHeight;
-        private ConsoleColor currentFg;
-        private ConsoleColor currentBg;
-        private ConsoleColor defaultFg;
-        private ConsoleColor defaultBg;
         private char[] lineBuffer; // Pre-allocated buffer for rendering lines
 
-        public TerminalRenderer()
+        public TerminalRenderer(int width, int height)
         {
             frameBuffers = new List<Framebuffer>();
-            consoleWidth = Console.WindowWidth;
-            consoleHeight = Console.WindowHeight - 1;
+            consoleWidth = width;
+            consoleHeight = height;
 
             Console.CursorVisible = false;
-
-            defaultFg = Console.ForegroundColor;
-            defaultBg = Console.BackgroundColor;
-            currentFg = defaultFg;
-            currentBg = defaultBg;
 
             // Allocate the line buffer once
             lineBuffer = new char[consoleWidth];
@@ -51,7 +44,7 @@ namespace ConsoleGame.Renderer
 
                 if (fbX >= 0 && fbX < fb.Width && fbY >= 0 && fbY < fb.Height)
                 {
-                    Chexel chexel = fb.GetChexel(fbX, fbY);
+                    Chexel chexel = fb.chexels[fbX, fbY];
                     if (chexel.Char != ' ')
                     {
                         return chexel;
@@ -59,7 +52,7 @@ namespace ConsoleGame.Renderer
                 }
             }
 
-            return new Chexel(' ', defaultFg, defaultBg);
+            return new Chexel(' ', Color.Black, Color.Black);
         }
 
         public void Render()
@@ -68,64 +61,14 @@ namespace ConsoleGame.Renderer
 
             for (int y = 0; y < consoleHeight; y++)
             {
-                ConsoleColor? runFg = null;
-                ConsoleColor? runBg = null;
-                int segmentStart = 0;
-
-                for (int x = 0; x < consoleWidth; x++)
-                {
-                    Chexel chexel = GetChexelForPoint(x, y);
-
-                    // Always fill the buffer for this position
-                    lineBuffer[x] = chexel.Char;
-
-                    // Start a new run if needed
-                    if (runFg == null)
-                    {
-                        runFg = chexel.ForegroundColor;
-                        runBg = chexel.BackgroundColor;
-                        segmentStart = 0;
-                    }
-                    else if (chexel.ForegroundColor != runFg || chexel.BackgroundColor != runBg)
-                    {
-                        // Flush the previous run [segmentStart, x)
-                        if (currentFg != runFg.Value)
-                        {
-                            Console.ForegroundColor = runFg.Value;
-                            currentFg = runFg.Value;
-                        }
-                        if (currentBg != runBg.Value)
-                        {
-                            Console.BackgroundColor = runBg.Value;
-                            currentBg = runBg.Value;
-                        }
-                        Console.Write(lineBuffer, segmentStart, x - segmentStart);
-
-                        // Begin new run
-                        runFg = chexel.ForegroundColor;
-                        runBg = chexel.BackgroundColor;
-                        segmentStart = x;
-                    }
-                }
-
-                // Flush the final run for this line
-                if (runFg == null)
-                {
-                    runFg = currentFg;
-                    runBg = currentBg;
-                }
-                if (currentFg != runFg.Value)
-                {
-                    Console.ForegroundColor = runFg.Value;
-                    currentFg = runFg.Value;
-                }
-                if (currentBg != runBg.Value)
-                {
-                    Console.BackgroundColor = runBg.Value;
-                    currentBg = runBg.Value;
-                }
-                Console.WriteLine(lineBuffer, segmentStart, consoleWidth - segmentStart);
+                AnsiConsole.Write(GetLines(y));
+                AnsiConsole.WriteLine();
             }
+        }
+
+        private IRenderable GetLines(int y)
+        {
+            return new SegmentLine(frameBuffers[1], y);
         }
     }
 }

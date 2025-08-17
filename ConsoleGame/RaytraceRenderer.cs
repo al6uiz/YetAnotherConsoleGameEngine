@@ -1,5 +1,7 @@
 ﻿using ConsoleGame.Renderer;
+
 using System;
+using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -95,7 +97,7 @@ namespace ConsoleRayTracing
             {
                 for (int cx = 0; cx < fbW; cx++)
                 {
-                    fb.SetChexel(cx, cy, front[cx, cy]);
+                    fb.chexels[cx, cy] = front[cx, cy];
                 }
             }
         }
@@ -178,9 +180,7 @@ namespace ConsoleRayTracing
 
                                 Vec3 topSRGB = new Vec3(outTopR, outTopG, outTopB).Saturate();
                                 Vec3 botSRGB = new Vec3(outBotR, outBotG, outBotB).Saturate();
-                                ConsoleColor fg = ConsolePalette.NearestColor(topSRGB);
-                                ConsoleColor bg = ConsolePalette.NearestColor(botSRGB);
-                                target[cx, cy] = new Chexel('▀', fg, bg);
+                                target[cx, cy] = new Chexel('▀', ToColor(topSRGB), ToColor(botSRGB));
                             }
                         }
                     });
@@ -194,6 +194,11 @@ namespace ConsoleRayTracing
             catch
             {
             }
+        }
+
+        private Color ToColor(Vec3 color)
+        {
+            return Color.FromArgb((byte)(color.X * 255), (byte)(color.Y * 255), (byte)(color.Z * 255));
         }
 
         public void SetTaaEnabled(bool enabled)

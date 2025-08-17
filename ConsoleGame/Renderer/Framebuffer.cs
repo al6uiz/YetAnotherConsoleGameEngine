@@ -13,7 +13,7 @@ namespace ConsoleGame.Renderer
         public int ViewportX;
         public int ViewportY;
 
-        private Chexel[,] chexels;
+        public Chexel[,] chexels;
 
         public Framebuffer(int width, int height, int viewportX = 0, int viewportY = 0)
         {
@@ -26,25 +26,16 @@ namespace ConsoleGame.Renderer
             // Initialize chexels with default values (spaces with default console colors)
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
-                    chexels[x, y] = new Chexel(' ', ConsoleColor.Black, ConsoleColor.White);
+                    chexels[x, y] = new Chexel(' ', Color.Black, Color.White);
         }
 
-        public Chexel GetChexel(int x, int y)
-        {
-            return chexels[x, y];
-        }
-
-        public void SetChexel(int x, int y, Chexel chexel)
-        {
-            chexels[x, y] = chexel;
-        }
 
         // Method to clear the framebuffer
         public void Clear()
         {
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
-                    chexels[x, y] = new Chexel(' ', ConsoleColor.Black, ConsoleColor.White);
+                    chexels[x, y] = new Chexel(' ', Color.Black, Color.White);
         }
 
         // Export the framebuffer to a PNG image; each Chexel becomes a cell with background fill and a drawn glyph in the foreground color.
@@ -78,14 +69,14 @@ namespace ConsoleGame.Renderer
                                 Chexel chx = chexels[x, y];
                                 Rectangle cellRect = new Rectangle(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
 
-                                using (Brush bg = new SolidBrush(ConsoleColorConverter.ToColor(chx.BackgroundColor)))
+                                using (Brush bg = new SolidBrush(chx.BackgroundColor))
                                 {
                                     g.FillRectangle(bg, cellRect);
                                 }
 
                                 if (chx.Char != ' ')
                                 {
-                                    using (Brush fg = new SolidBrush(ConsoleColorConverter.ToColor(chx.ForegroundColor)))
+                                    using (Brush fg = new SolidBrush(chx.ForegroundColor))
                                     {
                                         g.DrawString(chx.Char.ToString(), font, fg, cellRect.Location, sf);
                                     }
