@@ -9,3 +9,10 @@
 ## Demo
 
 [![YouTube Demo](https://img.youtube.com/vi/BUj2oaoRCCc/0.jpg)](https://www.youtube.com/watch?v=BUj2oaoRCCc)
+
+---
+
+## External Models
+
+3D test model files referenced by the original project are taken from:  
+[alecjacobson/common-3d-test-models](https://github.com/alecjacobson/common-3d-test-models)
