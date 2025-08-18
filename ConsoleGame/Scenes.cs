@@ -123,7 +123,6 @@
             return s;
         }
 
-
         public static Scene BuildDemoScene()
         {
             Scene s = new Scene();

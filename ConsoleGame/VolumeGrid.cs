@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ConsoleRayTracing
+﻿namespace ConsoleRayTracing
 {
     public sealed class VolumeGrid : Hittable
     {

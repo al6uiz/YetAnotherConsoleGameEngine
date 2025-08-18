@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ConsoleRayTracing
+﻿namespace ConsoleRayTracing
 {
     // File: MeshSwatches.cs
     // Curated sRGB swatches that intentionally "snap" to the 16-color console palette,
@@ -68,6 +66,7 @@ namespace ConsoleRayTracing
 
             // ---------- Neutrals (great for bones, clay, porcelain, etc.) ----------
             public static readonly Vec3 Black = FromConsole(ConsoleColor.Black);
+
             public static readonly Vec3 Charcoal = FromConsole(ConsoleColor.DarkGray);
             public static readonly Vec3 Stone = FromConsole(ConsoleColor.Gray);
             public static readonly Vec3 WhiteSoft = Scale(ConsoleColor.White, 0.85f);   // avoids harsh clipping
@@ -75,11 +74,13 @@ namespace ConsoleRayTracing
 
             // ---------- Metals / warm materials ----------
             public static readonly Vec3 Gold = Scale(ConsoleColor.Yellow, 0.90f);
+
             public static readonly Vec3 Brass = Scale(ConsoleColor.DarkYellow, 1.00f);
             public static readonly Vec3 Copper = new Vec3(0.80f, 0.45f, 0.25f);      // will quantize near DarkYellow/Red
 
             // ---------- Gem-ish primaries (bright but softened a bit) ----------
             public static readonly Vec3 Ruby = Scale(ConsoleColor.Red, 0.92f);
+
             public static readonly Vec3 Emerald = Scale(ConsoleColor.Green, 0.85f);
             public static readonly Vec3 Sapphire = Scale(ConsoleColor.Blue, 0.85f);
             public static readonly Vec3 Amethyst = Scale(ConsoleColor.Magenta, 0.88f);
@@ -88,12 +89,14 @@ namespace ConsoleRayTracing
 
             // ---------- Helpful dark accents ----------
             public static readonly Vec3 OxideRed = FromConsole(ConsoleColor.DarkRed);
+
             public static readonly Vec3 PineGreen = FromConsole(ConsoleColor.DarkGreen);
             public static readonly Vec3 Navy = FromConsole(ConsoleColor.DarkBlue);
             public static readonly Vec3 Plum = FromConsole(ConsoleColor.DarkMagenta);
 
             // ---------- Console-aligned primaries (exact anchors) ----------
             public static readonly Vec3 Red = FromConsole(ConsoleColor.Red);
+
             public static readonly Vec3 Green = FromConsole(ConsoleColor.Green);
             public static readonly Vec3 Blue = FromConsole(ConsoleColor.Blue);
             public static readonly Vec3 Magenta = FromConsole(ConsoleColor.Magenta);
@@ -117,7 +120,6 @@ namespace ConsoleRayTracing
             }
         }
     }
-
 
     public static class ConsolePalette
     {
@@ -152,6 +154,7 @@ namespace ConsoleRayTracing
 
         // Tunables (empirically good for 16-color mapping)
         private const float ChromaNeutralThreshold = 0.020f;        // lower than before so fewer colors collapse to gray
+
         private const float LWeight = 0.5f;                         // lightness weight
         private const float CWeight = 1.8f;                         // chroma weight
         private const float HWeightBase = 1.0f;                     // base hue weight

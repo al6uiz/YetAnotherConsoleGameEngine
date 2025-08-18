@@ -2,10 +2,6 @@
 using ConsoleGame.Components;
 using ConsoleGame.Entities;
 using ConsoleGame.Renderer;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ConsoleRayTracing
 {

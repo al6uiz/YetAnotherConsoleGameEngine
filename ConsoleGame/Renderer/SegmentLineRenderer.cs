@@ -5,8 +5,10 @@ using Color = System.Drawing.Color;
 
 namespace ConsoleGame.Renderer
 {
-    public class SegmentLine(Framebuffer buffer, int y) : IRenderable
+    public class SegmentLineRenderer(Framebuffer buffer) : IRenderable
     {
+        public int CurrentLine { get; set; }
+
         public Measurement Measure(RenderOptions options, int maxWidth)
         {
             return new Measurement(maxWidth, maxWidth);
@@ -17,8 +19,8 @@ namespace ConsoleGame.Renderer
             for (int i = 0; i < buffer.Width; i++)
             {
                 yield return new Segment(
-                    buffer.chexels[i, y].Char == '▀' ? "▀" : " ",
-                    new Style(Convert(buffer.chexels[i, y].ForegroundColor), Convert(buffer.chexels[i, y].BackgroundColor)));
+                    buffer.chexels[i, CurrentLine].Char == '▀' ? "▀" : " ",
+                    new Style(Convert(buffer.chexels[i, CurrentLine].ForegroundColor), Convert(buffer.chexels[i, CurrentLine].BackgroundColor)));
             }
         }
 

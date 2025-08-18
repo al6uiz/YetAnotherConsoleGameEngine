@@ -1,6 +1,4 @@
 ﻿// File: TaaAccumulator.cs
-using System;
-
 namespace ConsoleRayTracing
 {
     public sealed class TaaAccumulator

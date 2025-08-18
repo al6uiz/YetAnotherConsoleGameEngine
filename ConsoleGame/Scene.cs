@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace ConsoleRayTracing
+﻿namespace ConsoleRayTracing
 {
     public class Scene
     {

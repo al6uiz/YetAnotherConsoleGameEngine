@@ -1,6 +1,4 @@
 ﻿// File: BVH.cs
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace ConsoleRayTracing

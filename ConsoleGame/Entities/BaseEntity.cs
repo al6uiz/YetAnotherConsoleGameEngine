@@ -1,6 +1,5 @@
 ﻿using ConsoleGame.Components;
 using ConsoleGame.Renderer;
-using System.Collections.Generic;
 
 namespace ConsoleGame.Entities
 {
