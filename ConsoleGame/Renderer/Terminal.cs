@@ -1,7 +1,6 @@
 ﻿using ConsoleGame.Entities;
-using System;
+
 using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace ConsoleGame.Renderer
 {
@@ -93,7 +92,7 @@ namespace ConsoleGame.Renderer
                 // HUD: print current fps and ms per frame on the last console line
                 double frameMs = stopwatch.Elapsed.TotalMilliseconds;
                 double fps = frameMs > 0.0 ? 1000.0 / frameMs : 0.0;
-                string hud = $"{debugString} fps: {fps:0.0}  ms: {frameMs:0.00}";
+                string hud = $"move: A,S,D,F,Q,R | rotate: arrows | change scene: U,I | {debugString} fps: {fps:0.0}  ms: {frameMs:0.00}";
                 int hudlen = renderer.consoleWidth - 1;
                 if (hud.Length < hudlen)
                 {
