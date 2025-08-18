@@ -1,8 +1,6 @@
 ﻿// File: ObjMesh.cs
-using System;
-using System.IO;
 using System.Globalization;
-using System.Collections.Generic;
+using System.Text;
 
 namespace ConsoleRayTracing
 {
@@ -42,49 +40,54 @@ namespace ConsoleRayTracing
             float minX = 1e30f, minY = 1e30f, minZ = 1e30f;
             float maxX = -1e30f, maxY = -1e30f, maxZ = -1e30f;
 
+            Span<Range> ranges = stackalloc Range[16];
+            Span<int> vIdx = stackalloc int[16];
+
             using (var sr = new StreamReader(path))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)
                 {
                     if (line.Length == 0 || line[0] == '#') continue;
-                    string[] tok = line.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-                    if (tok.Length == 0) continue;
+                    var lineSpan = line.AsSpan();
+                    var tokCount = lineSpan.Split(ranges, ' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (tokCount == 0) continue;
 
-                    if (tok[0] == "v" && tok.Length >= 4)
+                    if (Ascii.Equals(lineSpan[ranges[0]], "v") && tokCount >= 4)
                     {
-                        float x = float.Parse(tok[1], ci) * scale + t.X;
-                        float y = float.Parse(tok[2], ci) * scale + t.Y;
-                        float z = float.Parse(tok[3], ci) * scale + t.Z;
+                        float x = float.Parse(lineSpan[ranges[1]], ci) * scale + t.X;
+                        float y = float.Parse(lineSpan[ranges[2]], ci) * scale + t.Y;
+                        float z = float.Parse(lineSpan[ranges[3]], ci) * scale + t.Z;
                         positions.Add(new Vec3(x, y, z));
                         if (!haveAny) haveAny = true;
                         if (x < minX) minX = x; if (y < minY) minY = y; if (z < minZ) minZ = z;
                         if (x > maxX) maxX = x; if (y > maxY) maxY = y; if (z > maxZ) maxZ = z;
                     }
-                    else if (tok[0] == "vn" && tok.Length >= 4)
+                    else if (Ascii.Equals(lineSpan[ranges[0]], "vn") && tokCount >= 4)
                     {
-                        float x = float.Parse(tok[1], ci);
-                        float y = float.Parse(tok[2], ci);
-                        float z = float.Parse(tok[3], ci);
+                        float x = float.Parse(lineSpan[ranges[1]], ci);
+                        float y = float.Parse(lineSpan[ranges[2]], ci);
+                        float z = float.Parse(lineSpan[ranges[3]], ci);
                         normals.Add(new Vec3(x, y, z).Normalized());
                     }
-                    else if (tok[0] == "vt" && tok.Length >= 3)
+                    else if (Ascii.Equals(lineSpan[ranges[0]], "vt") && tokCount >= 3)
                     {
-                        float u = float.Parse(tok[1], ci);
-                        float v = float.Parse(tok[2], ci);
+                        float u = float.Parse(lineSpan[ranges[1]], ci);
+                        float v = float.Parse(lineSpan[ranges[2]], ci);
                         uvs.Add((u, v));
                     }
-                    else if (tok[0] == "f" && tok.Length >= 4)
+                    else if (Ascii.Equals(lineSpan[ranges[0]], "f") && tokCount >= 4)
                     {
                         // Parse polygon -> fan triangulate: (0, i-1, i)
-                        int faceVerts = tok.Length - 1;
-                        int[] vIdx = new int[faceVerts];
+                        int faceVerts = tokCount - 1;
 
                         for (int i = 0; i < faceVerts; i++)
                         {
                             // token forms: v, v/vt, v//vn, v/vt/vn; OBJ indexing is 1-based, negatives allowed
-                            string[] parts = tok[i + 1].Split('/');
-                            int vi = ParseIndex(parts[0], positions.Count);
+
+                            var tokenSpan = lineSpan[ranges[i + 1]];
+                            var partCount = tokenSpan.Split(ranges, '/');
+                            int vi = ParseIndex(tokenSpan[ranges[0]], positions.Count);
                             vIdx[i] = vi;
                         }
 
@@ -107,9 +110,9 @@ namespace ConsoleRayTracing
             return new Mesh(tris, mn, mx);
         }
 
-        private static int ParseIndex(string token, int count)
+        private static int ParseIndex(ReadOnlySpan<char> token, int count)
         {
-            if (string.IsNullOrEmpty(token)) return 0;
+            if (token.Length == 0) return 0;
             int idx = int.Parse(token, CultureInfo.InvariantCulture);
             if (idx > 0) return idx - 1; // 1-based -> 0-based
             return count + idx;          // negative indices: -1 = last

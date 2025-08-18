@@ -1,7 +1,6 @@
 ﻿// File: MeshScenes.Local.cs
-using System;
-using System.IO;
 using System.Globalization;
+
 using ConsoleRayTracing.ConsoleRayTracing;
 
 namespace ConsoleRayTracing
@@ -86,6 +85,8 @@ namespace ConsoleRayTracing
 
         private static bool TryReadObjBounds(string path, out Vec3 min, out Vec3 max)
         {
+            Span<Range> ranges = stackalloc Range[16];
+
             min = new Vec3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
             max = new Vec3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
             if (!File.Exists(path))
@@ -101,11 +102,12 @@ namespace ConsoleRayTracing
                     if (line.Length < 2) continue;
                     if (line[0] == 'v' && line[1] == ' ')
                     {
-                        string[] t = line.Substring(2).Trim().Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-                        if (t.Length < 3) continue;
-                        float x = float.Parse(t[0], nfi);
-                        float y = float.Parse(t[1], nfi);
-                        float z = float.Parse(t[2], nfi);
+                        var lineSpan = line.AsSpan(2);
+                        int tokenCount = lineSpan.Trim().Split(ranges, ' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (tokenCount < 3) continue;
+                        float x = float.Parse(lineSpan[ranges[0]], nfi);
+                        float y = float.Parse(lineSpan[ranges[1]], nfi);
+                        float z = float.Parse(lineSpan[ranges[2]], nfi);
                         if (x < min.X) min.X = x; if (y < min.Y) min.Y = y; if (z < min.Z) min.Z = z;
                         if (x > max.X) max.X = x; if (y > max.Y) max.Y = y; if (z > max.Z) max.Z = z;
                     }
